@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+}
+
+/* Custom Utilities for Tech Trend Look */
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  }
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}

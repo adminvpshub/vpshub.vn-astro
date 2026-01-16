@@ -1,0 +1,32 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { ArrowRight } from 'lucide-react';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="relative overflow-hidden py-24 lg:py-32">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-slate-900/0 to-slate-900/0"></div>
+  <div class="container relative mx-auto px-4 md:px-6 text-center">
+    <div class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 mb-8 backdrop-blur-sm">
+      <span class="flex h-2 w-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
+      High Performance Cloud Hosting
+    </div>
+    <h1 class="mx-auto max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl mb-6 bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent pb-2">
+      {t('hero.title')}
+    </h1>
+    <p class="mx-auto max-w-2xl text-lg text-slate-400 mb-10">
+      {t('hero.subtitle')}
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="#pricing" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-8 text-sm font-medium text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-700 hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700">
+        {t('hero.cta')}
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </a>
+      <a href="https://identity.vpshub.vn" class="inline-flex h-12 items-center justify-center rounded-md border border-slate-700 bg-slate-800/50 px-8 text-sm font-medium text-slate-300 shadow-sm transition-all hover:bg-slate-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-700">
+        Login
+      </a>
+    </div>
+  </div>
+</section>

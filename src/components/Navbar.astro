@@ -1,0 +1,38 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<nav class="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-900/80 backdrop-blur-md">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="flex h-16 items-center justify-between">
+      <div class="flex items-center gap-2">
+        <a href={`/${lang}`} class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+          VPSHUB
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#services" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">{t('nav.services')}</a>
+        <a href="#pricing" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
+        <a href="#contact" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">{t('nav.contact')}</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-2">
+            <a href="/en" class={`px-2 py-1 text-xs rounded ${lang === 'en' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>EN</a>
+            <a href="/vi" class={`px-2 py-1 text-xs rounded ${lang === 'vi' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>VI</a>
+        </div>
+        
+        <a href="https://identity.vpshub.vn" class="text-sm font-medium text-slate-300 hover:text-white hidden md:block">
+          {t('nav.login')}
+        </a>
+        <a href="https://identity.vpshub.vn" class="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50">
+          {t('nav.signup')}
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

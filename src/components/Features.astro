@@ -1,0 +1,63 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { Server, Zap, Shield, Headphones, MonitorSmartphone, Clock } from 'lucide-react';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const features = [
+  {
+    icon: Zap,
+    title: "Stable Performance",
+    desc: "Servers located in Southeast Asia ensure stable access speeds with 99% uptime."
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Easy to Manage",
+    desc: "The Plesk hosting panel makes installing and configuring your website as simple as a few clicks."
+  },
+  {
+    icon: Shield,
+    title: "Secured & Safe",
+    desc: "Free SSL via Sectigo SSL, ensuring strong data protection and effective defense against attacks."
+  },
+  {
+    icon: Headphones,
+    title: "Dedicated Support",
+    desc: "Fast technical support through popular channels: Zalo, Facebook Messenger, Email, and SMS."
+  },
+  {
+    icon: Server,
+    title: "Web Hosting",
+    desc: "Build and deploy your apps quickly, securely, with high performance — all at the lowest cost."
+  },
+  {
+    icon: Clock,
+    title: "99% Uptime",
+    desc: "We are committed to offering free support to build community trust."
+  }
+];
+---
+
+<section id="services" class="py-24 bg-slate-950">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">{t('features.title')}</h2>
+      <p class="mt-4 text-slate-400 max-w-2xl mx-auto">Foundational technologies have become widely adopted, and today they are combined to deliver services that are both high-value and easily accessible.</p>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {features.map((feature) => (
+        <div class="group relative rounded-2xl border border-white/5 bg-slate-900/50 p-8 hover:bg-slate-900 transition-colors">
+          <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+            <feature.icon className="h-6 w-6" />
+          </div>
+          <h3 class="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+          <p class="text-slate-400 leading-relaxed">
+            {feature.desc}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

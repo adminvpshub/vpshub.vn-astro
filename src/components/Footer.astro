@@ -1,0 +1,54 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { Mail, Phone, MapPin } from 'lucide-react';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<footer class="border-t border-white/10 bg-slate-950 py-12" id="contact">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">VPSHUB</h3>
+        <p class="text-sm text-slate-400">
+          Build Fast. Deploy Smarter. Scale Without Limits.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Links</h3>
+        <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="#services" class="hover:text-blue-400">Services</a></li>
+            <li><a href="#pricing" class="hover:text-blue-400">Pricing</a></li>
+            <li><a href="#contact" class="hover:text-blue-400">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">{t('footer.contact')}</h3>
+        <ul class="space-y-3 text-sm text-slate-400">
+          <li class="flex items-start gap-2">
+             <MapPin className="h-4 w-4 mt-1 text-blue-500" />
+             <span>Lavita Garden Apartment, 17 Street Number 3, Thu Duc ward, Ho Chi Minh city</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-blue-500" />
+            <a href="mailto:admin@vpshub.vn" class="hover:text-white">admin@vpshub.vn</a>
+          </li>
+          <li class="flex items-center gap-2">
+            <Phone className="h-4 w-4 text-blue-500" />
+            <a href="tel:0936856010" class="hover:text-white">0936-856-010</a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Legal</h3>
+        <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="#" class="hover:text-blue-400">{t('footer.terms')}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-8 border-t border-white/10 pt-8 text-center text-xs text-slate-500">
+      &copy; {new Date().getFullYear()} VPSHUB. All rights reserved.
+    </div>
+  </div>
+</footer>
