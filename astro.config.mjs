@@ -8,7 +8,16 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'https://identity.vpshub.vn',
+          changeOrigin: true,
+          secure: false,
+        }
+      }
+    }
   },
 
   integrations: [react()],
