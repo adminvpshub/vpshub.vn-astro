@@ -1,3 +1,22 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import Pricing from '../components/Pricing.astro';
+import Marketing from '../components/Marketing.astro';
+import Footer from '../components/Footer.astro';
+
+const lang = 'en';
 ---
-<meta http-equiv="refresh" content="0;url=/en/" />
+
+<Layout title="VPSHUB - Cloud Hosting & VPS" lang={lang}>
+  <Navbar />
+  <main>
+    <Hero />
+    <Features />
+    <Pricing />
+    <Marketing />
+  </main>
+  <Footer />
+</Layout>
