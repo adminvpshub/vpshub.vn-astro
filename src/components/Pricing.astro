@@ -19,10 +19,19 @@ const t = useTranslations(lang);
     <div class="grid gap-8 md:grid-cols-3 lg:gap-12 max-w-6xl mx-auto">
       <PricingGrid
         client:load
-        mostPopularText="Most Popular"
-        choosePlanText="Choose Plan"
+        mostPopularText={t('pricing.popular')}
+        choosePlanText={t('pricing.choose')}
         currency="VND"
         period="/month"
+        translations={{
+          loading: t('pricing.loading'),
+          error: t('pricing.error'),
+          traffic: t('pricing.traffic'),
+          unlimitedTraffic: t('pricing.unlimited_traffic'),
+          bandwidth: t('pricing.bandwidth'),
+          ipAddress: t('pricing.ip'),
+          ipAddresses: t('pricing.ips'),
+        }}
       />
     </div>
   </div>

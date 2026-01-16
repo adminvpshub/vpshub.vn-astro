@@ -22,13 +22,23 @@ interface PricingGridProps {
   choosePlanText: string;
   currency: string;
   period: string;
+  translations: {
+    loading: string;
+    error: string;
+    traffic: string;
+    unlimitedTraffic: string;
+    bandwidth: string;
+    ipAddress: string;
+    ipAddresses: string;
+  };
 }
 
 export default function PricingGrid({
-  mostPopularText = "Most Popular",
-  choosePlanText = "Choose Plan",
+  mostPopularText,
+  choosePlanText,
   currency = "VND",
-  period = "/month"
+  period = "/month",
+  translations
 }: PricingGridProps) {
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,9 +47,6 @@ export default function PricingGrid({
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        // Use relative path to leverage the Vite proxy in dev
-        // In prod, this assumes the API is available at the same origin /api/vps
-        // or that the user has handled CORS/Proxying in their production environment.
         const response = await fetch('/api/vps');
         if (!response.ok) {
           throw new Error('Failed to fetch pricing plans');
@@ -59,7 +66,7 @@ export default function PricingGrid({
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20 w-full text-slate-400">
-        Loading plans...
+        {translations.loading}
       </div>
     );
   }
@@ -67,7 +74,7 @@ export default function PricingGrid({
   if (error) {
     return (
       <div className="flex justify-center items-center py-20 w-full text-red-400">
-        {error}
+        {translations.error}
       </div>
     );
   }
@@ -81,10 +88,10 @@ export default function PricingGrid({
             plan.cpu,
             plan.ram,
             plan.disk,
-            plan.traffic === "Unlimited" ? "Unlimited Traffic" : `Traffic: ${plan.traffic}`,
-            `Bandwidth: ${plan.bandwidth}`,
+            plan.traffic === "Unlimited" ? translations.unlimitedTraffic : `${translations.traffic}: ${plan.traffic}`,
+            `${translations.bandwidth}: ${plan.bandwidth}`,
             plan.backup,
-            `${plan.numberOfIps} IP Address${plan.numberOfIps > 1 ? 'es' : ''}`,
+            `${plan.numberOfIps} ${plan.numberOfIps > 1 ? translations.ipAddresses : translations.ipAddress}`,
             plan.support
         ].filter(Boolean);
 
