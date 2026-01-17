@@ -16,20 +16,17 @@ interface AuthModalProps {
 const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ username: '', password: '', email: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
 
   const googleLogin = useGoogleLogin({
-    // Removed flow: 'auth-code' to default to implicit flow for access_token
     onSuccess: async (tokenResponse) => {
       setIsLoading(true);
       try {
-        // Fetch user info to get the email
         const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const userInfo = await userInfoResponse.json();
 
-        // Pass the access token and email to the auth handler
         await socialLogin('google', tokenResponse.access_token, userInfo.email);
         onLoginSuccess();
         onClose();
@@ -46,9 +43,15 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isLoginMode && formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await login(formData.username, formData.password);
+      await login(formData.email, formData.password);
       onLoginSuccess();
       onClose();
     } catch (error) {
@@ -79,7 +82,6 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-slate-400 hover:text-white transition-colors"
@@ -94,7 +96,6 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             </h2>
           </div>
 
-          {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
               onClick={() => handleSocialLogin('google')}
@@ -143,33 +144,17 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLoginMode && (
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  {translations['auth.email']}
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="name@example.com"
-                />
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">
-                {translations['auth.username']}
+                {translations['auth.email']}
               </label>
               <input
-                type="text"
+                type="email"
                 required
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder={translations['auth.username']}
+                placeholder="name@example.com"
               />
             </div>
 
@@ -186,6 +171,22 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 placeholder="••••••••"
               />
             </div>
+
+            {!isLoginMode && (
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
 
             <button
               type="submit"

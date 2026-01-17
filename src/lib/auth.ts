@@ -18,15 +18,16 @@ const generateToken = () => {
   return 'mock_token_' + Math.random().toString(36).substr(2) + '_' + Date.now();
 };
 
-export const login = async (username: string, password: string): Promise<{ user: User; token: string }> => {
+export const login = async (email: string, password: string): Promise<{ user: User; token: string }> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
 
   // Mock successful login for any input
   const token = generateToken();
+  const username = email.split('@')[0];
   const user: User = {
     username,
-    email: `${username}@example.com`,
+    email,
   };
 
   localStorage.setItem(TOKEN_KEY, token);
