@@ -3,26 +3,63 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Github, Mail } from 'lucide-react';
 import { login, socialLogin } from '../../lib/auth';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: () => void;
   translations: Record<string, string>;
+  initialView?: 'login' | 'register';
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations }) => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
+// Inner component to use the Google hook
+const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations, initialView }) => {
+  const [isLoginMode, setIsLoginMode] = useState(initialView === 'register' ? false : true);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ username: '', password: '', email: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
+
+  // Reset mode when isOpen changes or initialView changes is handled by re-mounting or we should use useEffect.
+  // Since AuthModal is conditionally rendered by the parent (isOpen check in Wrapper),
+  // the state will reset every time it opens IF the wrapper unmounts it.
+  // The Wrapper does: if (!props.isOpen) return null;
+  // So AuthModalContent unmounts when closed.
+  // Thus, useState(initialView...) works perfectly for initialization on open.
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      try {
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const userInfo = await userInfoResponse.json();
+
+        await socialLogin('google', tokenResponse.access_token, userInfo.email);
+        onLoginSuccess();
+        onClose();
+      } catch (error) {
+        console.error('Google login failed', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: (error) => console.error('Google Login Error:', error),
+  });
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isLoginMode && formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await login(formData.username, formData.password);
+      await login(formData.email, formData.password);
       onLoginSuccess();
       onClose();
     } catch (error) {
@@ -33,6 +70,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
   };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
+    if (provider === 'google') {
+      googleLogin();
+      return;
+    }
+
     setIsLoading(true);
     try {
       await socialLogin(provider);
@@ -48,7 +90,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
   const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-slate-400 hover:text-white transition-colors"
@@ -63,7 +104,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
             </h2>
           </div>
 
-          {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button
               onClick={() => handleSocialLogin('google')}
@@ -112,33 +152,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLoginMode && (
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  {translations['auth.email']}
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="name@example.com"
-                />
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">
-                {translations['auth.username']}
+                {translations['auth.email']}
               </label>
               <input
-                type="text"
+                type="email"
                 required
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder={translations['auth.username']}
+                placeholder="name@example.com"
               />
             </div>
 
@@ -155,6 +179,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
                 placeholder="••••••••"
               />
             </div>
+
+            {!isLoginMode && (
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full rounded-lg bg-slate-800 border border-white/10 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
 
             <button
               type="submit"
@@ -179,6 +219,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
   );
 
   return createPortal(modalContent, document.body);
+};
+
+// Wrapper to provide context
+const AuthModal: React.FC<AuthModalProps> = (props) => {
+  if (!props.isOpen) return null;
+  return (
+    <GoogleOAuthProvider clientId="191036157586-7ioan5ct6dd23qfqqk728pip3tvpt0p2.apps.googleusercontent.com">
+      <AuthModalContent {...props} />
+    </GoogleOAuthProvider>
+  );
 };
 
 export default AuthModal;

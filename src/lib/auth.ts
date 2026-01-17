@@ -18,15 +18,16 @@ const generateToken = () => {
   return 'mock_token_' + Math.random().toString(36).substr(2) + '_' + Date.now();
 };
 
-export const login = async (username: string, password: string): Promise<{ user: User; token: string }> => {
+export const login = async (email: string, password: string): Promise<{ user: User; token: string }> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
 
   // Mock successful login for any input
   const token = generateToken();
+  const username = email.split('@')[0];
   const user: User = {
     username,
-    email: `${username}@example.com`,
+    email,
   };
 
   localStorage.setItem(TOKEN_KEY, token);
@@ -35,14 +36,18 @@ export const login = async (username: string, password: string): Promise<{ user:
   return { user, token };
 };
 
-export const socialLogin = async (provider: 'google' | 'github'): Promise<{ user: User; token: string }> => {
+export const socialLogin = async (provider: 'google' | 'github', providerToken?: string, email?: string): Promise<{ user: User; token: string }> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
+
+  if (provider === 'google' && providerToken) {
+    console.log("Passing Google token to backend:", providerToken);
+  }
 
   const token = generateToken();
   const user: User = {
     username: `${provider}_user`,
-    email: `user@${provider}.com`,
+    email: email || `user@${provider}.com`,
   };
 
   localStorage.setItem(TOKEN_KEY, token);
