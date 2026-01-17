@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Github, Mail } from 'lucide-react';
 import { login, socialLogin } from '../../lib/auth';
 
@@ -44,9 +45,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
     }
   };
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -176,6 +177,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default AuthModal;
