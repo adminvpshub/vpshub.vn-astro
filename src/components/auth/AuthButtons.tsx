@@ -52,6 +52,9 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ translations, initialLang }) 
     <>
       {authState.isAuthenticated ? (
         <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-slate-300 hidden sm:block">
+            {authState.user?.email}
+          </span>
           <a
             href={dashboardUrl}
             className="text-sm font-medium text-slate-300 hover:text-white flex items-center gap-2 transition-colors"

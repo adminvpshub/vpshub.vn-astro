@@ -35,12 +35,12 @@ export const login = async (username: string, password: string): Promise<{ user:
   return { user, token };
 };
 
-export const socialLogin = async (provider: 'google' | 'github', providerToken?: string): Promise<{ user: User; token: string }> => {
+export const socialLogin = async (provider: 'google' | 'github', authCode?: string): Promise<{ user: User; token: string }> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  if (provider === 'google' && providerToken) {
-    console.log("Passing Google token to backend:", providerToken);
+  if (provider === 'google' && authCode) {
+    console.log("Passing Google auth code to backend:", authCode);
   }
 
   const token = generateToken();

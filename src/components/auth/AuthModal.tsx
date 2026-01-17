@@ -19,11 +19,12 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [formData, setFormData] = useState({ username: '', password: '', email: '' });
 
   const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
+    flow: 'auth-code', // Use auth-code flow to get a code exchangeable for id_token
+    onSuccess: async (codeResponse) => {
       setIsLoading(true);
       try {
-        // Pass the access token to the auth handler
-        await socialLogin('google', tokenResponse.access_token);
+        // Pass the auth code to the auth handler
+        await socialLogin('google', codeResponse.code);
         onLoginSuccess();
         onClose();
       } catch (error) {
