@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Github, Mail } from 'lucide-react';
 import { login, socialLogin } from '../../lib/auth';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,10 +12,28 @@ interface AuthModalProps {
   translations: Record<string, string>;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations }) => {
+// Inner component to use the Google hook
+const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ username: '', password: '', email: '' });
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      try {
+        // Pass the access token to the auth handler
+        await socialLogin('google', tokenResponse.access_token);
+        onLoginSuccess();
+        onClose();
+      } catch (error) {
+        console.error('Google login failed', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: (error) => console.error('Google Login Error:', error),
+  });
 
   if (!isOpen) return null;
 
@@ -33,6 +52,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
   };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
+    if (provider === 'google') {
+      googleLogin();
+      return;
+    }
+
     setIsLoading(true);
     try {
       await socialLogin(provider);
@@ -179,6 +203,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, 
   );
 
   return createPortal(modalContent, document.body);
+};
+
+// Wrapper to provide context
+const AuthModal: React.FC<AuthModalProps> = (props) => {
+  if (!props.isOpen) return null;
+  return (
+    <GoogleOAuthProvider clientId="191036157586-7ioan5ct6dd23qfqqk728pip3tvpt0p2.apps.googleusercontent.com">
+      <AuthModalContent {...props} />
+    </GoogleOAuthProvider>
+  );
 };
 
 export default AuthModal;
