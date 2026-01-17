@@ -10,13 +10,21 @@ interface AuthModalProps {
   onClose: () => void;
   onLoginSuccess: () => void;
   translations: Record<string, string>;
+  initialView?: 'login' | 'register';
 }
 
 // Inner component to use the Google hook
-const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations }) => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
+const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, translations, initialView }) => {
+  const [isLoginMode, setIsLoginMode] = useState(initialView === 'register' ? false : true);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
+
+  // Reset mode when isOpen changes or initialView changes is handled by re-mounting or we should use useEffect.
+  // Since AuthModal is conditionally rendered by the parent (isOpen check in Wrapper),
+  // the state will reset every time it opens IF the wrapper unmounts it.
+  // The Wrapper does: if (!props.isOpen) return null;
+  // So AuthModalContent unmounts when closed.
+  // Thus, useState(initialView...) works perfectly for initialization on open.
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {

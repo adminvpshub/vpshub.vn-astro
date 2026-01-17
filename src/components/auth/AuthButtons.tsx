@@ -12,6 +12,7 @@ interface AuthButtonsProps {
 const AuthButtons: React.FC<AuthButtonsProps> = ({ translations, initialLang }) => {
   const [authState, setAuthState] = useState<AuthState>({ user: null, token: null, isAuthenticated: false });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalView, setModalView] = useState<'login' | 'register'>('login');
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -28,6 +29,16 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ translations, initialLang }) 
   const handleLogout = () => {
     logout();
     setAuthState({ user: null, token: null, isAuthenticated: false });
+  };
+
+  const openLogin = () => {
+    setModalView('login');
+    setIsModalOpen(true);
+  };
+
+  const openRegister = () => {
+    setModalView('register');
+    setIsModalOpen(true);
   };
 
   // Avoid hydration mismatch by not rendering until loaded on client
@@ -73,13 +84,13 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ translations, initialLang }) 
       ) : (
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openLogin}
             className="text-sm font-medium text-slate-300 hover:text-white hidden md:block"
           >
             {translations['nav.login']}
           </button>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openRegister}
             className="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50"
           >
             {translations['nav.signup']}
@@ -92,6 +103,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ translations, initialLang }) 
         onClose={() => setIsModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
         translations={translations}
+        initialView={modalView}
       />
     </>
   );
