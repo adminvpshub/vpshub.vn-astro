@@ -19,12 +19,18 @@ const AuthModalContent: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [formData, setFormData] = useState({ username: '', password: '', email: '' });
 
   const googleLogin = useGoogleLogin({
-    flow: 'auth-code', // Use auth-code flow to get a code exchangeable for id_token
-    onSuccess: async (codeResponse) => {
+    // Removed flow: 'auth-code' to default to implicit flow for access_token
+    onSuccess: async (tokenResponse) => {
       setIsLoading(true);
       try {
-        // Pass the auth code to the auth handler
-        await socialLogin('google', codeResponse.code);
+        // Fetch user info to get the email
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const userInfo = await userInfoResponse.json();
+
+        // Pass the access token and email to the auth handler
+        await socialLogin('google', tokenResponse.access_token, userInfo.email);
         onLoginSuccess();
         onClose();
       } catch (error) {
